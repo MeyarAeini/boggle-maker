@@ -1,0 +1,11 @@
+[package]
+name = "boggle-maker"
+version = "0.1.0"
+edition = "2024"
+description = "Boggle game board generator with a target total score."
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+genetic_algorithm = "0.18.1"
+rand = "0.9.0"
+word-trie = "0.1.0"
