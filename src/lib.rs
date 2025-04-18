@@ -11,3 +11,4 @@ pub mod total_boggle_score_calculator;
 
 pub use builder::BoggleBuilder;
 pub use boggle_board::Board;
+pub use boggle_dfs::{WordVisitor,BoggleDfsContext,BoggleDfs};

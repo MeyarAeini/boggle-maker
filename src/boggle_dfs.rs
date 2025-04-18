@@ -1,5 +1,6 @@
 use word_trie::trie::{Trie,TrieNode};
 
+/// gets the word score 
 pub fn get_word_score(word: &str) -> u32{
     let len = word.len();
     match len {
@@ -13,6 +14,7 @@ pub fn get_word_score(word: &str) -> u32{
     }
 }
 
+/// The boggle dfs context struct.
 #[derive(Debug, Clone)]
 pub struct BoggleDfsContext<'a> {
     dictionary: &'a Trie,
@@ -21,6 +23,7 @@ pub struct BoggleDfsContext<'a> {
 }
 
 impl <'a> BoggleDfsContext<'a> {
+    /// initiate a new boggle dfs context.
     pub fn new(dictionary : &'a Trie, width:usize, length:usize)->Self{
         Self{
             dictionary,
@@ -29,27 +32,33 @@ impl <'a> BoggleDfsContext<'a> {
         }
     }
 
+    /// get boggle board's width
     pub fn width(&self) -> usize {
         self.width
     }
 
+    /// get boggle board's length
     pub fn length(&self) -> usize {
         self.length
     }
 
+    /// gets the trie for the boggle board dfs
     pub fn dictionary(&self) -> &'a Trie {
         self.dictionary
     }
 
+    /// gets the boggle board characters count.
     pub fn count(&self) -> usize {
         self.width * self.length
     }
 }
 
+/// The word visitor trait 
 pub trait WordVisitor {
     fn visit(&mut self, word: &str);    
 }
 
+/// The boggle DFS struct
 pub struct BoggleDfs<'a> {    
     context: &'a BoggleDfsContext<'a>,
     visitors: Vec<&'a mut dyn WordVisitor>,
@@ -59,6 +68,7 @@ pub struct BoggleDfs<'a> {
 }
 
 impl<'a> BoggleDfs<'a>{
+    ///initiate a new boggle dfs instance
     pub fn new(context : &'a BoggleDfsContext<'a>,board: &'a Vec<char>) -> Self {
         let visited = vec![false; context.count()];
         let current = String::new();
@@ -71,12 +81,14 @@ impl<'a> BoggleDfs<'a>{
         }
     }
 
+    /// add a visitor to be triggered on dfs result found events
     pub fn with_visitor(&mut self, visitor: &'a mut dyn WordVisitor) -> &mut Self{
         self.visitors.push(visitor);
 
         self
     }
 
+    /// trigger the dfs search
     pub fn run(&mut self){   
         for i in 0..self.context.width {
             for j in 0..self.context.length {
@@ -132,6 +144,7 @@ impl<'a> BoggleDfs<'a>{
     }
 
     fn visit(&mut self) {
+        // this part needs to be enhanced to use async 
         for visitor in self.visitors.iter_mut() {
             visitor.visit(&self.current);    
         } 
