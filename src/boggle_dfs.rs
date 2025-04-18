@@ -112,9 +112,7 @@ impl<'a> BoggleDfs<'a>{
 
         //check if the current word is a valid word in the dictionary 
         if node.is_word { 
-            for visitor in self.visitors.iter_mut() {
-                visitor.visit(&self.current);    
-            }                       
+            self.visit();    
         }
 
         //Recursively check all neighbour cells 
@@ -131,6 +129,12 @@ impl<'a> BoggleDfs<'a>{
 
         //mark the current cell as not visited 
         self.visited[cell_index] = false;      
+    }
+
+    fn visit(&mut self) {
+        for visitor in self.visitors.iter_mut() {
+            visitor.visit(&self.current);    
+        } 
     }
 
     fn cell_value(&self, index: usize) -> char {
