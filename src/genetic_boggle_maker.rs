@@ -20,14 +20,31 @@ impl <'a> BoggleFitness<'a> {
         }
     }
 
-    pub fn get_board_score(&self,board:&Vec<char>) -> usize{         
+    fn get_board_score(&self,board:&Vec<char>) -> usize{         
         let mut set = HashMap::new();
         let mut visited = HashMap::new(); 
 
         let mut current = String::new();
+
+        let mut word_found_handler = |word: &str| {
+            //if yes then check if it's not been added to the result set yet
+            //if not added then add it to the result set with a proper calculated score
+            if !set.contains_key(word) {               
+                set.insert(word.to_string(), Self::get_score(word.len()));
+            }
+        };
+
         for i in 0..self.x_size{
             for j in 0..self.y_size{
-                self.get_board_score_from(&self.dictionary.root,board,&mut set,&mut visited,i,j,&mut current);
+                self.get_board_score_from(
+                    &self.dictionary.root,
+                    board,
+                    &mut visited,
+                    i,
+                    j,
+                    &mut current,   
+                    &mut word_found_handler                 
+                    );
             }
         }
 
@@ -40,14 +57,16 @@ impl <'a> BoggleFitness<'a> {
         score
     }
 
-    fn get_board_score_from(&self,mut node:&TrieNode ,
+    fn get_board_score_from<F>(&self,mut node:&TrieNode ,
             brd:&Vec<char>,
-            set:&mut HashMap<String,usize>,
             visited:&mut HashMap<usize,bool>,
             x:usize,
             y:usize,
-            current:&mut String
-        ){
+            current:&mut String,
+            on_word_found: &mut F
+        )
+        where F: FnMut(&str)
+    {
         
         let cell_index = x*self.x_size + y;
         let is_visited = visited.entry(cell_index).or_insert(false);
@@ -74,10 +93,8 @@ impl <'a> BoggleFitness<'a> {
         current.push(ch);
 
         //check if the current word is a valid word in the dictionary 
-        //if yes then check if it's not been added to the result set yet
-        //if not added then add it to the result set with a proper calculated score
-        if node.is_word && !set.contains_key(current) {                
-            set.insert(current.to_string(),Self::get_score(current.len()));
+        if node.is_word {   
+            on_word_found(current);             
         }
 
         //Recursively check all neighbour cells 
@@ -85,7 +102,7 @@ impl <'a> BoggleFitness<'a> {
             let next_x = x as i8 + a;
             let next_y = y as i8 + b;
             if (0..self.x_size as i8).contains(&next_x) && (0..self.y_size as i8).contains(&next_y){
-                self.get_board_score_from(node,brd, set, visited,next_x as usize,next_y as usize, current); 
+                self.get_board_score_from(node,brd, visited,next_x as usize,next_y as usize, current, on_word_found); 
             }           
         }
 

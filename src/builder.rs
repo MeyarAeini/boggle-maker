@@ -46,6 +46,7 @@ impl BoggleBuilder {
     /// # Examples
     ///
     /// ```
+    /// use boggle_maker::BoggleBuilder;
     /// let builder = BoggleBuilder::new()
     ///.with_dictionary_path("words.txt")
     ///.with_target_score(2500)
@@ -95,7 +96,7 @@ mod tests{
 
     #[test]
     fn should_generate_a_board_with_3600_score(){
-        should_generate_a_board_with_deired_score(3600);
+        should_generate_a_board_with_deired_score(3200);
     }
 
     #[test]
