@@ -6,6 +6,8 @@ pub mod builder;
 pub mod genetic_boggle_maker;
 pub mod simple_genetic_boggle_maker;
 pub mod boggle_board;
+pub mod boggle_dfs;
+pub mod total_boggle_score_calculator;
 
 pub use builder::BoggleBuilder;
 pub use boggle_board::Board;
