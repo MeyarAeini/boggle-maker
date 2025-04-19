@@ -89,7 +89,7 @@ impl<'a> BoggleDfs<'a>{
     }
 
     /// trigger the dfs search
-    pub fn run(&mut self){   
+    pub fn search(&mut self){   
         for i in 0..self.context.width {
             for j in 0..self.context.length {
                 self.dfs(&self.context.dictionary().root, i, j);

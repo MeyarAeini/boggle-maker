@@ -34,7 +34,7 @@ impl <'a> TotalBoggleScoreCalculator<'a> {
        
         let mut visitor = TotalScoreWordVisitor(HashSet::new(),0);
         let mut session = BoggleDfs::new(&self.0 , board);
-        session.with_visitor(&mut visitor).run();
+        session.with_visitor(&mut visitor).search();
 
         visitor.score()
     }  
