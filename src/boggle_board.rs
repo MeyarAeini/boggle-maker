@@ -35,6 +35,11 @@ impl Board{
         self.score
     }
 
+    /// gets board's value
+    pub fn value(&self) -> &Vec<char>{
+        &self.value
+    }
+
     ///generate a random board by given width and length
     pub fn new_random(width : usize, length : usize)->Self{
         let mut brd = Self{

@@ -55,7 +55,7 @@ impl <'a> BoggleDfsContext<'a> {
 
 /// The word visitor trait 
 pub trait WordVisitor {
-    fn visit(&mut self, word: &str);    
+    fn visit(&mut self, word: &str, path: &Vec<u16>);    
 }
 
 /// The boggle DFS struct
@@ -65,6 +65,7 @@ pub struct BoggleDfs<'a> {
     visited: Vec<bool>,
     current: String,
     board: &'a Vec<char>,
+    path: Vec<u16>,
 }
 
 impl<'a> BoggleDfs<'a>{
@@ -72,12 +73,14 @@ impl<'a> BoggleDfs<'a>{
     pub fn new(context : &'a BoggleDfsContext<'a>,board: &'a Vec<char>) -> Self {
         let visited = vec![false; context.count()];
         let current = String::new();
+        let path = Vec::new();
         Self{
             context,
             visitors: Vec::new(),
             visited,
             current,
             board,
+            path,
         }
     }
 
@@ -121,6 +124,7 @@ impl<'a> BoggleDfs<'a>{
         }
         //add current cell's letter to the current word
         self.current.push(ch);
+        self.path.push(cell_index as u16);
 
         //check if the current word is a valid word in the dictionary 
         if node.is_word { 
@@ -138,6 +142,7 @@ impl<'a> BoggleDfs<'a>{
 
         //Remove current visited cell letter from current word end.
         self.current.pop();
+        self.path.pop();
 
         //mark the current cell as not visited 
         self.visited[cell_index] = false;      
@@ -146,7 +151,7 @@ impl<'a> BoggleDfs<'a>{
     fn visit(&mut self) {
         // this part needs to be enhanced to use async 
         for visitor in self.visitors.iter_mut() {
-            visitor.visit(&self.current);    
+            visitor.visit(&self.current, &self.path);    
         } 
     }
 

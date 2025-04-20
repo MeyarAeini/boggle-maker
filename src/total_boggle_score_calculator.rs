@@ -11,7 +11,7 @@ impl TotalScoreWordVisitor {
 }
 
 impl WordVisitor for TotalScoreWordVisitor {
-    fn visit(&mut self, word: &str){
+    fn visit(&mut self, word: &str, _: &Vec<u16>){
         if !self.0.contains(word) {
             self.1 += get_word_score(word);
             self.0.insert(word.to_string());
