@@ -124,6 +124,7 @@ impl BoggleBoardSolver {
 #[cfg(test)]
 pub mod tests {
     use super::*;
+    use crate::builder::BoggleBuilder;
 
     #[test]
     fn there_should_be_atleast_10_words_with_score_3(){
@@ -146,7 +147,7 @@ pub mod tests {
     }
 
     #[test]
-    fn there_should_be_atleast_0_words_with_score_4(){
+    fn there_should_be_no_words_with_score_4(){
         let solver = BoggleBoardSolver::new()
             .with_dictionary("words.txt");
 
@@ -164,5 +165,28 @@ pub mod tests {
         let four_count = result.how_many(4);
         assert_eq!(four_count,0);
         println!("There are {four_count} words with score equal to 4");
+    }
+
+    #[test]
+    fn there_should_be_some_words_with_3_scores_for_a_board_generated(){
+        let solver = BoggleBoardSolver::new()
+                .with_dictionary("words.txt");
+        assert!(solver.is_ok(), "Failed to load trie from words.txt file");
+        let solver = solver.unwrap();
+
+        let board = BoggleBuilder::new()
+                .with_dictionary_path("words.txt")
+                .with_target_score(3000)
+                .with_length(4)
+                .with_width(4)
+                .build()
+                .unwrap();
+        assert!(board.is_some());
+        let board = board.unwrap();
+        
+        let result = solver.solve(&board).unwrap();
+        let three_count = result.how_many(3);
+        assert!(three_count > 0);
+        println!("There are {three_count} words with score equal to 3");
     }
 }
