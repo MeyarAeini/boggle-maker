@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use std::collections::{HashSet, HashMap};
 use word_trie::trie::Trie;
 use word_trie::TrieBuilder;
 use crate::boggle_dfs::{WordVisitor,BoggleDfsContext,BoggleDfs,get_word_score};
@@ -9,6 +9,7 @@ pub struct BoggleBoardResult {
     words: HashSet<String>,
     path_tracks: Vec<Vec<u16>>,
     counts: Vec<u32>,
+    length_map: HashMap<usize, usize>,
 }
 
 impl BoggleBoardResult {
@@ -17,13 +18,24 @@ impl BoggleBoardResult {
         Self{
             words: HashSet::new(),
             path_tracks: Vec::new(),
-            counts : vec![0;12], 
+            counts: vec![0;12], 
+            length_map: HashMap::new(),
         }
     }
 
     /// gets the result for query of how many words exists in the board with specefic score.
     pub fn how_many(&self, score: usize) -> u32 {        
         if score > 11 { 0 } else { self.counts[score] }        
+    }
+
+    /// gets a refrence to all score counts vector
+    pub fn score_counts(&self) -> &Vec<u32> {
+        &self.counts
+    }
+
+    /// gets a reference to word length' count map.
+    pub fn len_counts(&self) -> &HashMap<usize,usize> {
+        &self.length_map
     }
 
     /// gets the board's all words hash set
@@ -39,9 +51,14 @@ impl BoggleBoardResult {
     pub(crate) fn add_word(&mut self, word: String){
         //update the score map
         let score = get_word_score(&word);
-        self.inc_score(score);
+        self.inc_score(score);       
+        
+        let word_len = word.len();
+        let entry = self.length_map.entry(word_len).or_insert(0);
+        *entry += 1;
 
-        self.words.insert(word);        
+        //consume the word memory, this should be last statement
+        self.words.insert(word);
     }
 
     pub(crate) fn add_path(&mut self, path: Vec<u16>){
@@ -126,21 +143,38 @@ pub mod tests {
     use super::*;
     use crate::builder::BoggleBuilder;
 
-    #[test]
-    fn there_should_be_atleast_10_words_with_score_3(){
-        let solver = BoggleBoardSolver::new()
-            .with_dictionary("words.txt");
+    fn get_sample_solver() -> Result<BoggleBoardSolver, std::io::Error> {
+        BoggleBoardSolver::new().with_dictionary("words.txt")
+    }
 
-        assert!(solver.is_ok(), "Failed to load trie from file");
+    fn get_sample_board() -> Vec<char> {
+        vec!['S','E','R','S','P','A','T','G','L','I','N','E','S','E','R','S']
+    }
 
-        let solver = solver.unwrap();
-
-        let board = vec!['S','E','R','S','P','A','T','G','L','I','N','E','S','E','R','S'];
+    fn solve_sample_board() -> BoggleBoardResult {
+        let solver = get_sample_solver().unwrap();
+        let board = get_sample_board();
 
         let result = solver.solve_vec(&board, 4, 4);
         assert!(result.is_some(), "the result does not have value");
 
-        let result = result.unwrap();
+        result.unwrap()
+    }
+
+    #[test]
+    fn sample_solver_loads_successfully(){
+        let solver = get_sample_solver();
+        assert!(solver.is_ok(), "Failed to load trie from file");
+    }
+
+    #[test]
+    fn can_solve_sample_board(){
+        let _ = solve_sample_board();
+    }
+
+    #[test]
+    fn there_should_be_atleast_10_words_with_score_3(){
+        let result = solve_sample_board();
         let three_count = result.how_many(3);
         assert!(three_count>10);
         println!("There are {three_count} words with score equal to 3");
@@ -148,20 +182,7 @@ pub mod tests {
 
     #[test]
     fn there_should_be_no_words_with_score_4(){
-        let solver = BoggleBoardSolver::new()
-            .with_dictionary("words.txt");
-
-        assert!(solver.is_ok(), "Failed to load trie from file");
-
-        let solver = solver.unwrap();
-
-        let board = vec!['S','E','R','S','P','A','T','G','L','I','N','E','S','E','R','S'];
-
-        let result = solver.solve_vec(&board, 4, 4);
-        assert!(result.is_some(), "the result does not have value");
-
-        let result = result.unwrap();
-
+        let result = solve_sample_board();
         let four_count = result.how_many(4);
         assert_eq!(four_count,0);
         println!("There are {four_count} words with score equal to 4");
@@ -169,10 +190,7 @@ pub mod tests {
 
     #[test]
     fn there_should_be_some_words_with_3_scores_for_a_board_generated(){
-        let solver = BoggleBoardSolver::new()
-                .with_dictionary("words.txt");
-        assert!(solver.is_ok(), "Failed to load trie from words.txt file");
-        let solver = solver.unwrap();
+        let solver = get_sample_solver().unwrap();
 
         let board = BoggleBuilder::new()
                 .with_dictionary_path("words.txt")
@@ -188,5 +206,13 @@ pub mod tests {
         let three_count = result.how_many(3);
         assert!(three_count > 0);
         println!("There are {three_count} words with score equal to 3");
+    }
+
+    #[test]
+    fn there_should_a_word_with_length_7(){
+        let result = solve_sample_board();
+        let key = 7;
+        assert!(result.len_counts().contains_key(&key));
+        println!("There are {} words with length equal to 7", result.len_counts()[&key]);
     }
 }

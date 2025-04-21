@@ -1,8 +1,8 @@
 [package]
 name = "boggle-maker"
-version = "0.1.3"
+version = "0.1.4"
 edition = "2024"
-description = "Rust tools for Boggle enthusiasts: board generation and word analysis."
+description = "Rust tools for Boggle enthusiasts: board generation and analysis."
 license = "MIT OR Apache-2.0"
 
 [dependencies]

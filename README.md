@@ -1,7 +1,7 @@
 [![Docs Status](https://docs.rs/boggle-maker/badge.svg)](https://docs.rs/boggle-maker/)
 [![On crates.io](https://img.shields.io/crates/v/boggle-maker.svg)](https://crates.io/crates/boggle-maker)
 
-# `boggle-maker`: Rust tools for Boggle enthusiasts: board generation and word analysis.
+# `boggle-maker`: Rust tools for Boggle enthusiasts: board generation and analysis.
 
 This crate implements genetic algorithms for Boggle board generation as part of my ongoing Rust language learning journey. Expect continuous improvements to code quality and data structure design.
 
