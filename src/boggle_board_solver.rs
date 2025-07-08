@@ -51,17 +51,18 @@ impl BoggleBoardResult {
     pub(crate) fn add_word(&mut self, word: String){
         //update the score map
         let score = get_word_score(&word);
-        self.inc_score(score);       
-        
-        let word_len = word.len();
-        let entry = self.length_map.entry(word_len).or_insert(0);
-        *entry += 1;
+        self.inc_score(score); 
 
         //consume the word memory, this should be last statement
         self.words.insert(word);
     }
 
     pub(crate) fn add_path(&mut self, path: Vec<u16>){
+
+        let word_len = path.len();
+        let entry = self.length_map.entry(word_len).or_insert(0);
+        *entry += 1;
+
         self.path_tracks.push(path);
     }
 
@@ -214,5 +215,22 @@ pub mod tests {
         let key = 7;
         assert!(result.len_counts().contains_key(&key));
         println!("There are {} words with length equal to 7", result.len_counts()[&key]);
+    }
+
+    #[test]
+    fn print_result_for_sample_board() {
+        let solver = BoggleBoardSolver::new().with_dictionary("words.txt").unwrap();
+
+        let board = vec!['S','E','R','S','P','A','T','G','L','I','N','E','S','E','R','S'];
+
+        let result = solver.solve_vec(&board, 4, 4).unwrap();
+
+        for score in vec![1,2,3,5,11].iter() {
+            println!("There are {} words with score equal to {score}", result.how_many(*score));
+        }  
+
+        for (key,value) in result.len_counts().into_iter() {
+            println!("There are {value} words with length {key}");
+        }
     }
 }
